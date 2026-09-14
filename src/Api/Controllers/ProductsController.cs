@@ -9,17 +9,19 @@ namespace Api.Controllers;
 public class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IReadOnlyList<ProductDto>> GetProducts()
+    public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetProducts(CancellationToken cancellationToken)
     {
-        var products = productService.GetProducts();
+        var products = await productService.GetProducts(cancellationToken);
 
         return products.Select(x => new ProductDto(x.Id, x.Title)).ToList();
     }
 
     [HttpPost]
-    public ActionResult<ProductDto> CreateProduct([FromBody] CreateProductDto product)
+    public async Task<ActionResult<ProductDto>> CreateProduct(
+        [FromBody] CreateProductDto product,
+        CancellationToken cancellationToken)
     {
-        var newProduct = productService.Add(product.Title);
+        var newProduct = await productService.Add(product.Title, cancellationToken);
 
         return new ProductDto(newProduct.Id, newProduct.Title);
     }

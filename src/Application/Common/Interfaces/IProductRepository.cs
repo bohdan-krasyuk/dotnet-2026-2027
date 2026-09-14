@@ -4,8 +4,6 @@ namespace Application.Common.Interfaces;
 
 public interface IProductRepository
 {
-    Product Add(Product product);
-    Product Update(Product product);
-    IReadOnlyList<Product> GetAll();
-    Product? GetByTitle(string title);
+    Task<Product> Add(Product product, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Product>> GetAll(CancellationToken cancellationToken);
 }

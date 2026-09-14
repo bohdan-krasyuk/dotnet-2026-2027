@@ -4,6 +4,6 @@ namespace Application.Products.Services.Abstract;
 
 public interface IProductService
 {
-    IReadOnlyList<Product> GetProducts();
-    Product Add(string title);
+    Task<IReadOnlyList<Product>> GetProducts(CancellationToken cancellationToken);
+    Task<Product> Add(string title, CancellationToken cancellationToken);
 }

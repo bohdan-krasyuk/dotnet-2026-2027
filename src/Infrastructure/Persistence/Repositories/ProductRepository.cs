@@ -1,40 +1,21 @@
 using Application.Common.Interfaces;
 using Domain.Products;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class ProductRepository : IProductRepository
+public class ProductRepository(ApplicationDbContext context) : IProductRepository
 {
-    private IList<Product> _products;
-
-    public ProductRepository()
+    public async Task<Product> Add(Product product, CancellationToken cancellationToken)
     {
-        _products = new List<Product>();
-    }
-
-    public Product Add(Product product)
-    {
-        _products.Add(product);
-        return product;
-    }
-
-    public Product Update(Product product)
-    {
-        var entity = _products.First(x => x.Id == product.Id);
-
-        var index = _products.IndexOf(entity);
-        _products[index] = product;
+        await context.Products.AddAsync(product, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return product;
     }
 
-    public IReadOnlyList<Product> GetAll()
+    public async Task<IReadOnlyList<Product>> GetAll(CancellationToken cancellationToken)
     {
-        return _products.ToList();
-    }
-
-    public Product? GetByTitle(string title)
-    {
-        return _products.FirstOrDefault(x => x.Title == title);
+        return await context.Products.ToListAsync(cancellationToken);
     }
 }

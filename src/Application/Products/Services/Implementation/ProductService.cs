@@ -6,20 +6,14 @@ namespace Application.Products.Services.Implementation;
 
 public class ProductService(IProductRepository productRepository): IProductService
 {
-    public IReadOnlyList<Product> GetProducts()
+    public async Task<IReadOnlyList<Product>> GetProducts(CancellationToken cancellationToken)
     {
-        return productRepository.GetAll();
+        return await productRepository.GetAll(cancellationToken);
     }
 
-    public Product Add(string title)
+    public async Task<Product> Add(string title, CancellationToken cancellationToken)
     {
-        var existingProduct = productRepository.GetByTitle(title);
-        if (existingProduct != null)
-        {
-            throw new ArgumentException($"Product with {title} already exists");
-        }
-
-        var entity = Product.New(Guid.NewGuid(), title);
-        return productRepository.Add(entity);
+        var product = Product.New(Guid.NewGuid(), title);
+        return await productRepository.Add(product, cancellationToken);
     }
 }
