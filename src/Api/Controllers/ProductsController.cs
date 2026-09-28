@@ -1,19 +1,23 @@
 using Api.Dtos;
-using Application.Products.Services.Abstract;
+using Application.Common.Interfaces.Queries;
+using Application.Products.Commands;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [Route("products")]
 [ApiController]
-public class ProductsController(IProductService productService) : ControllerBase
+public class ProductsController(
+    ISender sender,
+    IProductQueries productQueries) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetProducts(CancellationToken cancellationToken)
     {
-        var products = await productService.GetProducts(cancellationToken);
+        var products = await productQueries.GetAll(cancellationToken);
 
-        return products.Select(x => new ProductDto(x.Id, x.Title)).ToList();
+        return products.Select(ProductDto.FromDomainModel).ToList();
     }
 
     [HttpPost]
@@ -21,8 +25,13 @@ public class ProductsController(IProductService productService) : ControllerBase
         [FromBody] CreateProductDto product,
         CancellationToken cancellationToken)
     {
-        var newProduct = await productService.Add(product.Title, cancellationToken);
+        var input = new CreateProductCommand
+        {
+            Title = product.Title,
+        };
 
-        return new ProductDto(newProduct.Id, newProduct.Title);
+        var result = await sender.Send(input, cancellationToken);
+
+        return ProductDto.FromDomainModel(result);
     }
 }

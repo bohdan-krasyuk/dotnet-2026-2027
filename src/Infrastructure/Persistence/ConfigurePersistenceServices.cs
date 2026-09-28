@@ -1,4 +1,5 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.Queries;
+using Application.Common.Interfaces.Repositories;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -36,5 +37,6 @@ public static class ConfigurePersistenceServices
     {
         services.AddScoped<ProductRepository>();
         services.AddScoped<IProductRepository>(provider => provider.GetRequiredService<ProductRepository>());
+        services.AddScoped<IProductQueries>(provider => provider.GetRequiredService<ProductRepository>());
     }
 }
