@@ -2,13 +2,18 @@ namespace Domain.Products;
 
 public class Product
 {
-    public Guid Id { get; }
-    public string Title { get; }
+    public ProductId Id { get; }
+    public string Title { get; private set; }
     public DateTime CreatedAt { get; }
 
-    private Product(Guid id, string title, DateTime createdAt)
+    private Product(ProductId id, string title, DateTime createdAt)
         => (Id, Title, CreatedAt) = (id, title, createdAt);
 
-    public static Product New(Guid id, string title)
+    public static Product New(ProductId id, string title)
         => new(id, title, DateTime.UtcNow);
+
+    public void UpdateName(string title)
+    {
+        Title = title;
+    }
 }

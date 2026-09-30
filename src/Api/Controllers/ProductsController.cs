@@ -1,4 +1,5 @@
 using Api.Dtos;
+using Api.Modules.Errors;
 using Application.Common.Interfaces.Queries;
 using Application.Products.Commands;
 using MediatR;
@@ -32,6 +33,8 @@ public class ProductsController(
 
         var result = await sender.Send(input, cancellationToken);
 
-        return ProductDto.FromDomainModel(result);
+        return result.Match<ActionResult<ProductDto>>(
+            p => ProductDto.FromDomainModel(p),
+            e => e.ToObjectResult());
     }
 }
