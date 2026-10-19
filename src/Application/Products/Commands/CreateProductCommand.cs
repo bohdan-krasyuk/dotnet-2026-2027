@@ -20,7 +20,7 @@ public class CreateProductCommandHandler(IProductRepository productRepository)
     {
         var existingProduct = await productRepository.GetByName(request.Title.Trim(), cancellationToken);
         return await existingProduct.MatchAsync(
-            p =>  new ProductAlreadyExistsException(p.Id),
+            p => new ProductAlreadyExistsException(p.Id),
             () => CreateEntity(request, cancellationToken));
     }
 
