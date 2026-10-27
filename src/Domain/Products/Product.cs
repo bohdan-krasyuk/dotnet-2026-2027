@@ -12,7 +12,7 @@ public class Product
     public static Product New(ProductId id, string title)
         => new(id, title, DateTime.UtcNow);
 
-    public void UpdateName(string title)
+    public void UpdateTitle(string title)
     {
         Title = title;
     }

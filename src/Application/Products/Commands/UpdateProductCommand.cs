@@ -10,7 +10,7 @@ namespace Application.Products.Commands;
 public record UpdateProductCommand : IRequest<Either<ProductException, Product>>
 {
     public required Guid ProductId { get; init; }
-    public required string Name { get; init; }
+    public required string Title { get; init; }
 }
 
 public class UpdateProductCommandHandler(IProductRepository productRepository)
@@ -24,7 +24,7 @@ public class UpdateProductCommandHandler(IProductRepository productRepository)
 
         var product = await productRepository.GetById(productId, cancellationToken);
         return await product.MatchAsync(
-            p => CheckDuplicates(p.Id, request.Name, cancellationToken)
+            p => CheckDuplicates(p.Id, request.Title, cancellationToken)
                 .BindAsync(_ => UpdateEntity(p, request, cancellationToken)),
             () => new ProductNotFoundException(productId));
     }
@@ -36,7 +36,7 @@ public class UpdateProductCommandHandler(IProductRepository productRepository)
     {
         try
         {
-            product.UpdateName(request.Name);
+            product.UpdateTitle(request.Title);
 
             return await productRepository.Update(product, cancellationToken);
         }

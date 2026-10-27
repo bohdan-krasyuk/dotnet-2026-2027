@@ -23,12 +23,31 @@ public class ProductsController(
 
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct(
-        [FromBody] CreateProductDto product,
+        [FromBody] ProductDto product,
         CancellationToken cancellationToken)
     {
         var input = new CreateProductCommand
         {
             Title = product.Title,
+        };
+
+        var result = await sender.Send(input, cancellationToken);
+
+        return result.Match<ActionResult<ProductDto>>(
+            p => ProductDto.FromDomainModel(p),
+            e => e.ToObjectResult());
+    }
+
+    [HttpPut("{productId:guid}")]
+    public async Task<ActionResult<ProductDto>> UpdateProduct(
+        [FromRoute] Guid productId,
+        [FromBody] ProductDto product,
+        CancellationToken cancellationToken)
+    {
+        var input = new UpdateProductCommand
+        {
+            ProductId = productId,
+            Title = product.Title
         };
 
         var result = await sender.Send(input, cancellationToken);
