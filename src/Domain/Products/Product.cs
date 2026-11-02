@@ -6,6 +6,8 @@ public class Product
     public string Title { get; private set; }
     public DateTime CreatedAt { get; }
 
+    public ICollection<ProductCategory>? ProductCategories { get; } = null;
+
     private Product(ProductId id, string title, DateTime createdAt)
         => (Id, Title, CreatedAt) = (id, title, createdAt);
 
