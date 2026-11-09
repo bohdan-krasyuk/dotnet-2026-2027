@@ -16,6 +16,10 @@ public class ProductsConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnType("varchar(255)")
             .IsRequired();
 
+        builder.Property(x => x.Status)
+            .HasColumnType("varchar(32)")
+            .HasConversion(x => x.ToString(), x => ProductStatus.From(x));
+
         builder.Property(x => x.CreatedAt)
             .HasConversion(new DateTimeUtcConverter())
             .HasDefaultValueSql("timezone('utc', now())")
