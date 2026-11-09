@@ -81,6 +81,40 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("product_categories", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Products.Product", b =>
+                {
+                    b.OwnsMany("Domain.Products.ProductSpecification", "Specifications", b1 =>
+                        {
+                            b1.Property<Guid>("ProductId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasJsonPropertyName("title");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasJsonPropertyName("value");
+
+                            b1.HasKey("ProductId", "__synthesizedOrdinal")
+                                .HasName("pk_products");
+
+                            b1.ToTable("products");
+
+                            b1
+                                .ToJson("specifications")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId")
+                                .HasConstraintName("fk_products_products_product_id");
+                        });
+
+                    b.Navigation("Specifications");
+                });
+
             modelBuilder.Entity("Domain.Products.ProductCategory", b =>
                 {
                     b.HasOne("Domain.Categories.Category", "Category")

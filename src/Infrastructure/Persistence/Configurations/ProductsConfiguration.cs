@@ -20,5 +20,18 @@ public class ProductsConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(new DateTimeUtcConverter())
             .HasDefaultValueSql("timezone('utc', now())")
             .IsRequired();
+
+        builder.OwnsMany<ProductSpecification>(x => x.Specifications, specificationBuilder =>
+        {
+            specificationBuilder.ToJson("specifications");
+
+            specificationBuilder.Property(x => x.Title).HasJsonPropertyName("title");
+            specificationBuilder.Property(x => x.Value).HasJsonPropertyName("value");
+
+            // specificationBuilder.OwnsOne<SubSpecification>(x => x.SubSpecification, subSpecificationBuilder =>
+            // {
+            //     subSpecificationBuilder.Property(x => x.OrderIndex).HasColumnName("order_index");
+            // });
+        });
     }
 }

@@ -13,6 +13,16 @@ public class ProductsController(
     ISender sender,
     IProductQueries productQueries) : ControllerBase
 {
+    [HttpGet("specifications/{title}")]
+    public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetBySpecification(
+        [FromRoute] string title,
+        CancellationToken cancellationToken)
+    {
+        var products = await productQueries.GetBySpecification(title, cancellationToken);
+
+        return products.Select(ProductDto.FromDomainModel).ToList();
+    }
+
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetProducts(CancellationToken cancellationToken)
     {
@@ -29,6 +39,7 @@ public class ProductsController(
         var input = new CreateProductCommand
         {
             Title = product.Title,
+            Specifications = product.Specification.Select(ProductSpecificationDto.ToDomainModel).ToList()
         };
 
         var result = await sender.Send(input, cancellationToken);

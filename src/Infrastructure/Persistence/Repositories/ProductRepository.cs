@@ -29,6 +29,15 @@ public class ProductRepository(ApplicationDbContext context) : IProductRepositor
         return await context.Products.ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Product>> GetBySpecification(
+        string specification,
+        CancellationToken cancellationToken)
+    {
+        return await context.Products
+            .Where(x => x.Specifications!.Any(s => s.Title == specification))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Product> Add(Product product, CancellationToken cancellationToken)
     {
         await context.Products.AddAsync(product, cancellationToken);

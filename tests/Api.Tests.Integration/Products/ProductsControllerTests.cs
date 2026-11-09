@@ -29,13 +29,29 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
         _updateProductRoute = $"products/{_secondTestProduct.Id}";
     }
 
+    [Theory]
+    [InlineData("weight", 1)]
+    [InlineData("colour", 0)]
+    public async Task ShouldSearchBySpecification(string specificationTitle, int expectedResultCount)
+    {
+        // Act
+        var response = await Client.GetAsync($"products/specifications/{specificationTitle}");
+
+        // Assert
+        response.IsSuccessStatusCode.Should().BeTrue();
+
+        var responseDto = await response.Content.ReadFromJsonAsync<List<ProductDto>>();
+        responseDto!.Count.Should().Be(expectedResultCount);
+    }
+
     [Fact]
     public async Task ShouldCreateProduct()
     {
         // Arrange
         var request = new ProductDto(
             Id: null,
-            Title: _firstTestProduct.Title);
+            Title: _firstTestProduct.Title,
+            Specification: _firstTestProduct.Specifications!.Select(ProductSpecificationDto.FromDomainModel).ToList());
 
         // Act
         var response = await Client.PostAsJsonAsync(_createProductRoute, request);
@@ -51,6 +67,13 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
 
         dbProduct.Should().NotBeNull();
         dbProduct.Title.Should().Be(_firstTestProduct.Title);
+
+        dbProduct.Specifications!.ForEach(s =>
+        {
+            var inputSpecification = _firstTestProduct.Specifications!.First(x => x.Title == s.Title);
+
+            s.Value.Should().Be(inputSpecification.Value);
+        });
     }
 
     [Fact]
@@ -59,7 +82,8 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
         // Arrange
         var request = new ProductDto(
             Id: null,
-            Title: _secondTestProduct.Title);
+            Title: _secondTestProduct.Title,
+            Specification: []);
 
         // Act
         var response = await Client.PostAsJsonAsync(_createProductRoute, request);
@@ -77,7 +101,8 @@ public class ProductsControllerTests : BaseIntegrationTest, IAsyncLifetime
         // Arrange
         var request = new ProductDto(
             Id: _secondTestProduct.Id.Value,
-            Title: _thirdTestProduct.Title);
+            Title: _thirdTestProduct.Title,
+            Specification: []);
 
         // Act
         var response = await Client.PutAsJsonAsync(_updateProductRoute, request);

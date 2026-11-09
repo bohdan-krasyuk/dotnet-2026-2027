@@ -9,6 +9,7 @@ namespace Application.Products.Commands;
 public record CreateProductCommand : IRequest<Either<ProductException, Product>>
 {
     public required string Title { get; init; }
+    public required List<ProductSpecification> Specifications { get; init; }
 }
 
 public class CreateProductCommandHandler(IProductRepository productRepository)
@@ -28,7 +29,7 @@ public class CreateProductCommandHandler(IProductRepository productRepository)
     {
         try
         {
-            var product = Product.New(ProductId.New(), request.Title);
+            var product = Product.New(ProductId.New(), request.Title, request.Specifications);
             return await productRepository.Add(product, cancellationToken);
         }
         catch (Exception exception)
