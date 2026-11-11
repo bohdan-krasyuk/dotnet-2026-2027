@@ -9,4 +9,11 @@ public interface IProductQueries
     Task<IReadOnlyList<Product>> GetBySpecification(
         string specification,
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Product>> Filter(
+        string? title,
+        ProductStatus? status,
+        DateTime? createdAtFrom,
+        DateTime? createdAtTo,
+        CancellationToken cancellationToken);
 }

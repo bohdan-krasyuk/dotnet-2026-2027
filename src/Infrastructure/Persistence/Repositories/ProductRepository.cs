@@ -8,6 +8,38 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class ProductRepository(ApplicationDbContext context) : IProductRepository, IProductQueries
 {
+    public async Task<IReadOnlyList<Product>> Filter(
+        string? title,
+        ProductStatus? status,
+        DateTime? createdAtFrom,
+        DateTime? createdAtTo,
+        CancellationToken cancellationToken)
+    {
+        var query = context.Products.AsQueryable();
+
+        if (string.IsNullOrEmpty(title))
+        {
+            query = query.Where(x => x.Title.ToLower().StartsWith(title.ToLower()));
+        }
+
+        if (status != null)
+        {
+            query = query.Where(x => x.Status == status);
+        }
+
+        if (createdAtFrom.HasValue)
+        {
+            query = query.Where(x => x.CreatedAt >= createdAtFrom);
+        }
+
+        if (createdAtTo.HasValue)
+        {
+            query = query.Where(x => x.CreatedAt <= createdAtTo);
+        }
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
     public async Task<Option<Product>> GetByName(string name, CancellationToken cancellationToken)
     {
         var entity = await context.Products

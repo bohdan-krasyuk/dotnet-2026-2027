@@ -19,3 +19,5 @@ public record ProductSpecificationDto(string Title, string Value)
     public static ProductSpecification ToDomainModel(ProductSpecificationDto productSpecification)
         => ProductSpecification.New(productSpecification.Title, productSpecification.Value);
 }
+
+public record SearchProductDto(string? Title, string? Status, DateTime? CreatedAtFrom, DateTime? CreatedAtTo);

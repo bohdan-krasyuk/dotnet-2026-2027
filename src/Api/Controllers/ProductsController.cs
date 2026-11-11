@@ -14,6 +14,21 @@ public class ProductsController(
     ISender sender,
     IProductQueries productQueries) : ControllerBase
 {
+    [HttpPost("/filter")]
+    public async Task<ActionResult<List<ProductDto>>> FilterProducts(
+        [FromBody] SearchProductDto request,
+        CancellationToken cancellationToken)
+    {
+        var products = await productQueries.Filter(
+            title: request.Title,
+            status: request.Status == null ? null : ProductStatus.From(request.Status),
+            createdAtFrom: request.CreatedAtFrom,
+            createdAtTo: request.CreatedAtTo,
+            cancellationToken: cancellationToken);
+
+        return products.Select(ProductDto.FromDomainModel).ToList();
+    }
+
     [HttpGet("specifications/{title}")]
     public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetBySpecification(
         [FromRoute] string title,
